@@ -136,8 +136,8 @@ class IssueCreatorAgent:
             return False
 
         # Guard Rail 3:
+        # steps_since_last_creation is advanced by Simulation.try_dynamic_issue_creation
         if self.steps_since_last_creation < self.CREATION_COOLDOWN:
-            self.steps_since_last_creation += 1
             logger.info(f"Cooldown period active ({self.steps_since_last_creation}/{self.CREATION_COOLDOWN}), skipping issue creation")
             return False
 

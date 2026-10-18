@@ -11,6 +11,7 @@ from LLAMOSC.agents.maintainer import MaintainerAgent
 from LLAMOSC.agents.contributor import ContributorAgent
 from langchain_community.chat_models import ChatOllama
 from langchain.schema import SystemMessage, HumanMessage
+import os
 import random
 import logging
 
@@ -185,11 +186,13 @@ class Simulation:
 
     def try_dynamic_issue_creation(self, issue_creator, issue_queue, existing_issues, existing_code, issues_folder):
         # Build simulation state dict
+        # Keys must match the ones read in IssueCreatorAgent.should_create_issue.
+        # Pending issues are the files still in the pending folder; solved ones are moved out of it.
         simulation_state = {
-            'issues_solved': self.issues_solved,
-            'pending_issues': len(existing_issues),
+            'solved_issues': self.issues_solved,
+            'pending_issues': len(os.listdir(issues_folder)),
             'avg_code_quality': self.avg_code_quality,
-            'active_contributors': len([c for c in self.contributors if c.available]),
+            'contributors': len([c for c in self.contributors if c.available]),
             'time_step': self.time_step
         }
         
@@ -201,7 +204,9 @@ class Simulation:
                 new_issue = issue_creator.create_issue(existing_issues, existing_code, issues_folder)
                 if new_issue:
                     issue_queue.append(new_issue)
-                    existing_issues.append(new_issue)
+                    # run_llamosc passes the same list for both; avoid queueing the issue twice
+                    if existing_issues is not issue_queue:
+                        existing_issues.append(new_issue)
                     issue_creator.dynamic_issues_created += 1
                     issue_creator.steps_since_last_creation = 0
                     log_and_print(f"Created new dynamic issue: #{new_issue.id}")

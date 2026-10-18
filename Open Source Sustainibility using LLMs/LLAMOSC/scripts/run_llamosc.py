@@ -198,6 +198,7 @@ def main():
     }
 
     def update(timestep):
+        sim.time_step = timestep
 
         # Contributor metrics
         log_and_print(f"\nTime Step: {timestep}\n")
@@ -320,6 +321,8 @@ def main():
                 os.makedirs(solved_dir, exist_ok=True)
                 solved_issue_path = os.path.join(solved_dir, f"task_{task_id}.md")
                 os.rename(issue.filepath, solved_issue_path)
+                # keep the Issue pointing at its file, the issue creator re-reads it later
+                issue.filepath = solved_issue_path
                 repo_commit_current_changes(project_dir)
 
             else:

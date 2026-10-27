@@ -103,7 +103,8 @@ class Simulation:
                     agent.current_tasks.pop(0)
 
     def simulate_dropout(self, count=2):
-        dropout_agents = random.sample([a for a in self.agents if not getattr(a, "inactive", False)], k=count)
+        active_agents = [a for a in self.agents if not getattr(a, "inactive", False)]
+        dropout_agents = random.sample(active_agents, k=min(count, len(active_agents)))
         for agent in dropout_agents:
             agent.inactive = True
             agent.dropped_tasks = len(agent.current_tasks)

@@ -9,12 +9,17 @@ class MABAllocator:
         self.agents = agents
         self.exploration_factor = exploration_factor
 
+    @staticmethod
+    def _is_available(agent):
+        # Agents that dropped out have task_load reset to 0, so check inactive as well
+        return agent.task_load < agent.max_load and not getattr(agent, "inactive", False)
+
     def select_agent(self, task):
         task_type = task.task_type
 
         # Exploration
         if np.random.random() < self.exploration_factor:
-            available_agents = [a for a in self.agents if a.task_load < a.max_load]
+            available_agents = [a for a in self.agents if self._is_available(a)]
             if available_agents:
                 return np.random.choice(available_agents)
             return None
@@ -24,7 +29,7 @@ class MABAllocator:
         best_agent = None
 
         for agent in self.agents:
-            if agent.task_load >= agent.max_load:
+            if not self._is_available(agent):
                 continue
 
             task_idx = agent._task_type_to_idx(task_type)

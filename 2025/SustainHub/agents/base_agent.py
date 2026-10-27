@@ -48,7 +48,7 @@ class BaseAgent:
             })
 
             print(f"⚠️ {self.name} skipped the task '{task_type}' → reward: {reward}")
-            return
+            return False
 
         # If action is do_task
         task_idx = self._task_type_to_idx(task_type)
@@ -72,6 +72,7 @@ class BaseAgent:
         })
 
         print(f"✅ {self.name} used action '{action}' for {task_type} → reward: {reward}")
+        return True
 
     def calculate_reward(self, task_type):
         return 1  # Now universally +1 for success

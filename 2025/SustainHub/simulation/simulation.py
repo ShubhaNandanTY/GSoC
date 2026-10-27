@@ -100,7 +100,9 @@ class Simulation:
                             entry["completion_status"] = "Success" if success else "Fail"
                             break
 
-                    agent.current_tasks.pop(0)
+                # complete_task already decremented task_load, so the task leaves the queue
+                # whether it was done or skipped
+                agent.current_tasks.pop(0)
 
     def simulate_dropout(self, count=2):
         dropout_agents = random.sample([a for a in self.agents if not getattr(a, "inactive", False)], k=count)

@@ -57,16 +57,15 @@ class Simulation:
                 selected_agent = self.mab_allocator.select_agent(task)
 
             if selected_agent and selected_agent.assign_task(task):
-                # Increment reassignment counters
-                self.total_reassigned_tasks_step += 1
-                selected_agent.reassigned_tasks = getattr(selected_agent, "reassigned_tasks", 0) + 1
-
                 print(f"Assigned {task.task_type} task to {selected_agent.name}")
 
                 for entry in self.dropped_task_log:
                     if entry["task_type"] == task.task_type and entry["reassigned_to"] is None:
                         entry["reassigned_to"] = selected_agent.name
                         entry["completion_status"] = "Pending"
+                        # Only a task that takes over a dropped one counts as a reassignment (RO, TRE)
+                        self.total_reassigned_tasks_step += 1
+                        selected_agent.reassigned_tasks = getattr(selected_agent, "reassigned_tasks", 0) + 1
                         break
             else:
                 print(f"No available agent for {task.task_type} task")

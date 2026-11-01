@@ -31,6 +31,10 @@ class SARSAAgentLogic:
         with open(self.path, "w") as f:
             json.dump(self.q_table, f, indent=2)
 
+    def save(self):
+        """Write the Q-table to disk (called once at the end of a simulation run)."""
+        self._save_q_table()
+
     def get_q(self, state, action):
         state_str = str(state)
         return self.q_table.get(state_str, {}).get(action, 0.0)
@@ -60,5 +64,5 @@ class SARSAAgentLogic:
 
         new_q = q_current + self.alpha * (reward + self.gamma * q_next - q_current)
         self.q_table[s][a] = new_q
-
-        self._save_q_table()
+        # Not written to disk here: rewriting the JSON file on every update took about
+        # a third of a run's time. Simulation.save_agents() calls save() instead.

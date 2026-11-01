@@ -40,6 +40,8 @@ class Simulation:
         return agents
 
     def save_agents(self):
+        for agent in self.agents:
+            agent.sarsa.save()
         data = {agent.name: agent.to_dict() for agent in self.agents}
         os.makedirs(DATA_DIR, exist_ok=True)
         with open(SAVE_FILE, 'w') as f:
